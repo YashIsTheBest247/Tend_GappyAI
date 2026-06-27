@@ -85,7 +85,7 @@ export default function ReviewPage() {
           <p className="page-sub">Drafts the AI prepared — approve, edit, or send back in one click.</p>
         </div>
         <Btn variant="accent" onClick={runAutopilot} disabled={running || autoReady.length === 0}>
-          ⚡ {running ? "Autopilot running…" : `Autopilot — auto-send ${autoReady.length} ship-rated`}
+           {running ? "Autopilot running…" : `Autopilot — auto-send ${autoReady.length} ship-rated`}
         </Btn>
       </div>
 

@@ -8,7 +8,9 @@ Every ticket — from email, an in-app form, Slack, or a live Telegram bot — i
 answered from your own docs, quality-checked by a second AI, and routed to a human (or Autopilot) for approval.
 And it writes its own documentation to get smarter over time.
 
-[Live app → console.apps.lemma.work](https://console.apps.lemma.work) · Built for the **Gappy AI National Hackathon** · Problem statement: **AI Customer Support Desk for a Startup**
+[Live app → console.apps.lemma.work](https://console.apps.lemma.work) · [Live Telegram bot → @tend_support_bot](https://t.me/tend_support_bot)
+
+Built for the **Gappy AI National Hackathon** · Problem statement: **AI Customer Support Desk for a Startup**
 
 </div>
 
@@ -46,7 +48,7 @@ All of step 2–4 happens **autonomously the moment a ticket arrives** — no hu
 **Autonomy**
 -  **Fully autonomous pipeline** — a datastore schedule runs triage → draft → QA the instant any ticket is created
 -  **Autopilot** — one click auto-sends every draft the QA agent rated *ship* (≥90); humans only handle the rest
--  **Live Telegram agent** — a customer-facing agent answers from your docs and logs tickets into the desk
+-  **Live Telegram agent** ([@tend_support_bot](https://t.me/tend_support_bot)) — a customer-facing agent answers from your docs and logs tickets into the desk
 
 **Intelligence & product**
 -  **Insights dashboard** — resolution rate, first-response time, SLA-at-risk, avg AI confidence, avg QA score, ship-rate, and breakdowns by category / priority / sentiment / status

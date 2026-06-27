@@ -69,7 +69,7 @@ export default function QueuePage() {
           <h1 className="page-title">Queue</h1>
           <p className="page-sub">Every request auto-triaged, drafted &amp; QA-graded the moment it lands.</p>
         </div>
-        <span className="auto-pill">⚡ Autonomous mode</span>
+        <span className="auto-pill">Autonomous mode</span>
       </div>
 
       <div className="stats" style={{ marginBottom: 28 }}>

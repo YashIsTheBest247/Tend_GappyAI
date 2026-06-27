@@ -37,6 +37,7 @@ Two things make it stand out:
 ## How to try it (for judges)
 
 - **Hosted app:** https://console.apps.lemma.work *(hosted on lemma.work; pod access shared with `ayush@gappy.ai`)*
+- **Live Telegram bot:** **[@tend_support_bot](https://t.me/tend_support_bot)** — DM it a support question (e.g. *"I was charged twice, can I get a refund?"*). It answers from the knowledge base, and the ticket appears in Tend within ~30s, already triaged, drafted, and QA-graded.
 - **90-second demo path:**
   1. **Create a ticket** (the "+ New ticket" form, or text the live Telegram bot) — it appears already
      triaged, drafted, and QA-scored, with **no human trigger**.

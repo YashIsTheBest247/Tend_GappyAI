@@ -103,7 +103,7 @@ export default function InsightsPage() {
       <Card style={{ marginBottom: 20 }}>
         <div className="between" style={{ marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
           <h3 style={{ fontSize: 18 }}>Automation &amp; channels</h3>
-          <span className="auto-pill">⚡ Autonomous mode ON</span>
+          <span className="auto-pill">Autonomous mode ON</span>
         </div>
         <p className="muted-text" style={{ fontSize: 13.5, marginBottom: 16, maxWidth: 720 }}>
           Every ticket — from any channel — is auto-triaged, drafted from your docs, and graded by a second QA agent the
