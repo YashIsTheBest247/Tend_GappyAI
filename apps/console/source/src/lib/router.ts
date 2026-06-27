@@ -5,6 +5,7 @@ export type Route =
   | { name: "review" }
   | { name: "ticket"; id: string }
   | { name: "insights" }
+  | { name: "customers" }
   | { name: "knowledge" }
   | { name: "assistant" }
   | { name: "new" };
@@ -16,6 +17,7 @@ function parse(hash: string): Route {
     case "review": return { name: "review" };
     case "ticket": return arg ? { name: "ticket", id: arg } : { name: "queue" };
     case "insights": return { name: "insights" };
+    case "customers": return { name: "customers" };
     case "knowledge": return { name: "knowledge" };
     case "assistant": return { name: "assistant" };
     case "new": return { name: "new" };
