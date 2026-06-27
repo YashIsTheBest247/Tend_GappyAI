@@ -1,0 +1,10 @@
+{
+  "grants": [
+    { "resource_type": "folder", "resource_name": "/knowledge", "permission_ids": ["folder.read"] },
+    { "resource_type": "datastore_table", "resource_name": "tickets", "permission_ids": ["datastore.table.read", "datastore.record.read", "datastore.record.write"] },
+    { "resource_type": "datastore_table", "resource_name": "messages", "permission_ids": ["datastore.table.read", "datastore.record.read", "datastore.record.write"] },
+    { "resource_type": "datastore_table", "resource_name": "ticket_events", "permission_ids": ["datastore.table.read", "datastore.record.read", "datastore.record.write"] },
+    { "resource_type": "function", "resource_name": "intake_ticket", "permission_ids": ["function.read", "function.execute"] },
+    { "resource_type": "workflow", "resource_name": "intake", "permission_ids": ["workflow.read", "workflow.execute"] }
+  ]
+}
