@@ -3,7 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support Desk Console</title>
+    <title>Tend — AI Support Desk</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <script>
+      // Set theme before first paint to avoid a flash of the wrong theme.
+      try {
+        var t = localStorage.getItem("desk-theme") ||
+          (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Cosmica is proprietary; DM Sans is the design system's named substitute. -->

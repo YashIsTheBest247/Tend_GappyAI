@@ -51,7 +51,7 @@ export default function ReviewPage() {
       ) : tickets.length === 0 ? (
         <Card><Empty>Nothing waiting on you. The AI will queue drafts here as tickets arrive.</Empty></Card>
       ) : (
-        <div className="grid" style={{ gap: 14 }}>
+        <div className="grid stagger-list" style={{ gap: 14 }}>
           {tickets.map((t) => <ReviewCard key={t.id} t={t} />)}
         </div>
       )}

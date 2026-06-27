@@ -8,6 +8,7 @@ import KnowledgePage from "./pages/KnowledgePage";
 import AssistantPage from "./pages/AssistantPage";
 import NewTicketPage from "./pages/NewTicketPage";
 import { Toaster } from "./lib/toast";
+import { Logo } from "./lib/Logo";
 
 const NAV = [
   { key: "queue", label: "Queue", href: "#/queue" },
@@ -17,18 +18,15 @@ const NAV = [
 ];
 
 function useTheme(): [string, () => void] {
-  const [theme, setTheme] = useState<string>("light");
-  useEffect(() => {
-    const saved = localStorage.getItem("desk-theme");
-    const initial = saved || (window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    document.documentElement.dataset.theme = initial;
-    setTheme(initial);
-  }, []);
+  // index.html already set documentElement.dataset.theme before paint — read it so there's no flash.
+  const [theme, setTheme] = useState<string>(
+    () => (typeof document !== "undefined" && document.documentElement.dataset.theme) || "light"
+  );
   const toggle = () => {
     setTheme((prev) => {
       const next = prev === "dark" ? "light" : "dark";
       document.documentElement.dataset.theme = next;
-      localStorage.setItem("desk-theme", next);
+      try { localStorage.setItem("desk-theme", next); } catch {}
       return next;
     });
   };
@@ -45,10 +43,10 @@ function Sidebar({ active, theme, toggleTheme }: { active: string; theme: string
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-mark">S</div>
+        <Logo size={38} className="brand-logo" />
         <div className="stack">
-          <span className="brand-name">Support Desk</span>
-          <span className="brand-sub">AI triage &amp; reply</span>
+          <span className="brand-name">Tend</span>
+          <span className="brand-sub">AI Support Desk</span>
         </div>
       </div>
 
@@ -81,12 +79,14 @@ export default function App() {
       <Sidebar active={active} theme={theme} toggleTheme={toggleTheme} />
       <main className="main">
         <div className="main-inner">
-          {route.name === "queue" && <QueuePage />}
-          {route.name === "review" && <ReviewPage />}
-          {route.name === "ticket" && <TicketPage id={route.id} />}
-          {route.name === "knowledge" && <KnowledgePage />}
-          {route.name === "assistant" && <AssistantPage />}
-          {route.name === "new" && <NewTicketPage />}
+          <div className="route-view" key={route.name === "ticket" ? `ticket-${route.id}` : route.name}>
+            {route.name === "queue" && <QueuePage />}
+            {route.name === "review" && <ReviewPage />}
+            {route.name === "ticket" && <TicketPage id={route.id} />}
+            {route.name === "knowledge" && <KnowledgePage />}
+            {route.name === "assistant" && <AssistantPage />}
+            {route.name === "new" && <NewTicketPage />}
+          </div>
         </div>
       </main>
       <Toaster />

@@ -118,7 +118,7 @@ export default function QueuePage() {
       ) : shown.length === 0 ? (
         <Card><Empty>{q || priority !== "all" ? "No tickets match your filters." : "No tickets here yet. Create one from “+ New ticket”."}</Empty></Card>
       ) : (
-        <div className="grid" style={{ gap: 10 }}>
+        <div className="grid stagger-list" style={{ gap: 10 }}>
           {shown.map((t) => <TicketRow key={t.id} t={t} />)}
         </div>
       )}
