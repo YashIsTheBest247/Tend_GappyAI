@@ -1,0 +1,27 @@
+{
+  "name": "kb-writer",
+  "description": "Turns a ticket the knowledge base couldn't answer into a clean, reusable knowledge-base article. Read-only; the publish_kb function writes it into /knowledge.",
+  "instruction": { "$file": "instruction.txt" },
+  "toolsets": ["POD"],
+  "input_schema": {
+    "type": "object",
+    "properties": { "ticket_id": { "type": "string" } },
+    "required": ["ticket_id"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string", "description": "Article title." },
+      "slug": { "type": "string", "description": "kebab-case filename slug, no extension." },
+      "body": { "type": "string", "description": "The full article, plain text, ready to publish." }
+    },
+    "required": ["title", "slug", "body"]
+  },
+  "permissions": {
+    "grants": [
+      { "resource_type": "datastore_table", "resource_name": "tickets", "permission_ids": ["datastore.table.read", "datastore.record.read"] },
+      { "resource_type": "datastore_table", "resource_name": "messages", "permission_ids": ["datastore.table.read", "datastore.record.read"] },
+      { "resource_type": "folder", "resource_name": "/knowledge", "permission_ids": ["folder.read"] }
+    ]
+  }
+}

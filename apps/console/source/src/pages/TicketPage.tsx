@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  useTicket, useMessages, useDrafts, useEvents, useFunctionRunner, useIntakeWorkflow, useTickets, useQuality, Draft, Ticket,
+  useTicket, useMessages, useDrafts, useEvents, useFunctionRunner, useIntakeWorkflow, useWriteKbWorkflow, useTickets, useQuality, Draft, Ticket,
 } from "../lib/podData";
 import { Card, Btn, Badge, StatusPill, PriorityTag, CategoryTag, Avatar, Loading, Empty } from "../lib/ui";
 import { go } from "../lib/router";
@@ -222,6 +222,7 @@ export default function TicketPage({ id }: { id: string }) {
   const { drafts } = useDrafts(id);
   const escalate = useFunctionRunner("escalate_ticket");
   const wf = useIntakeWorkflow();
+  const kb = useWriteKbWorkflow();
   const latest = drafts[0] ?? null;
   const sla = slaState(ticket?.sla_due_at);
 
@@ -246,6 +247,10 @@ export default function TicketPage({ id }: { id: string }) {
           <Btn variant="accent" size="sm" disabled={wf.starting}
                onClick={async () => { try { await wf.start(ticket.id); toast("AI is re-running — triage & draft…", "ok"); } catch { toast("Couldn't start the AI.", "err"); } }}>
             {wf.starting ? "Running…" : "Run AI"}
+          </Btn>
+          <Btn variant="soft" size="sm" disabled={kb.starting}
+               onClick={async () => { try { await kb.start(ticket.id); toast("AI is writing a KB article from this ticket…", "ok"); } catch { toast("Couldn't start the KB writer.", "err"); } }}>
+            {kb.starting ? "Writing…" : "Write KB article"}
           </Btn>
           <Btn variant="ghost" size="sm" disabled={escalate.busy}
                onClick={async () => { await escalate.run({ ticket_id: ticket.id, reason: "Manually escalated from console." }); toast("Ticket escalated", "info"); }}>

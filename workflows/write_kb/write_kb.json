@@ -1,0 +1,51 @@
+{
+  "name": "write_kb",
+  "description": "Turns a ticket the docs couldn't answer into a published knowledge-base article: kb-writer drafts it, publish_kb writes it into /knowledge (RAG).",
+  "start": { "type": "MANUAL" },
+  "nodes": [
+    {
+      "id": "input",
+      "type": "FORM",
+      "label": "Ticket",
+      "config": {
+        "input_schema": {
+          "type": "object",
+          "properties": { "ticket_id": { "type": "string" } },
+          "required": ["ticket_id"]
+        }
+      }
+    },
+    {
+      "id": "writer",
+      "type": "AGENT",
+      "label": "Write KB article",
+      "config": {
+        "agent_name": "kb-writer",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "input.ticket_id" }
+        }
+      }
+    },
+    {
+      "id": "publish",
+      "type": "FUNCTION",
+      "label": "Publish to /knowledge",
+      "config": {
+        "function_name": "publish_kb",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "input.ticket_id" },
+          "title": { "type": "expression", "value": "writer.title" },
+          "slug": { "type": "expression", "value": "writer.slug" },
+          "body": { "type": "expression", "value": "writer.body" }
+        }
+      }
+    },
+    { "id": "done", "type": "END", "label": "Published" }
+  ],
+  "edges": [
+    { "id": "e0", "source": "input", "target": "writer" },
+    { "id": "e1", "source": "writer", "target": "publish" },
+    { "id": "e2", "source": "publish", "target": "done" }
+  ],
+  "visibility": "POD"
+}

@@ -125,6 +125,12 @@ export function useIntakeWorkflow() {
   };
 }
 
+/** Starts the `write_kb` workflow — kb-writer drafts an article and publish_kb writes it to /knowledge. */
+export function useWriteKbWorkflow() {
+  const wf = useWorkflowStart({ client, podId, workflowName: "write_kb", autoLoad: false, autoPoll: false });
+  return { start: (ticketId: string) => wf.start({ ticket_id: ticketId }), starting: Boolean(wf.isStarting) };
+}
+
 export function useKnowledgeFiles() {
   const { files, isLoading } = useFiles({ client, podId, directoryPath: "/knowledge" });
   return { files: files ?? [], isLoading };

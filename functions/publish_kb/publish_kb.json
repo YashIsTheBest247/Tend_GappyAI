@@ -1,0 +1,12 @@
+{
+  "name": "publish_kb",
+  "description": "Publishes a generated article into the /knowledge document store (auto-indexed for RAG) so future drafts can ground in it. Logs a note on the source ticket.",
+  "type": "API",
+  "code": { "$file": "code.py" },
+  "permissions": {
+    "grants": [
+      { "resource_type": "folder", "resource_name": "/knowledge", "permission_ids": ["folder.read", "folder.write"] },
+      { "resource_type": "datastore_table", "resource_name": "ticket_events", "permission_ids": ["datastore.table.read", "datastore.record.read", "datastore.record.write"] }
+    ]
+  }
+}

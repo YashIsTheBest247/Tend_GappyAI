@@ -10,6 +10,7 @@ import NewTicketPage from "./pages/NewTicketPage";
 import InsightsPage from "./pages/InsightsPage";
 import { Toaster } from "./lib/toast";
 import { Logo } from "./lib/Logo";
+import { CommandPalette } from "./lib/CommandPalette";
 
 const NAV = [
   { key: "queue", label: "Queue", href: "#/queue" },
@@ -35,7 +36,7 @@ function useTheme(): [string, () => void] {
   return [theme, toggle];
 }
 
-function Sidebar({ active, theme, toggleTheme }: { active: string; theme: string; toggleTheme: () => void }) {
+function Sidebar({ active, theme, toggleTheme, openCmd }: { active: string; theme: string; toggleTheme: () => void; openCmd: () => void }) {
   // Live counts so the operator always sees what needs attention.
   const { tickets } = useTickets();
   const open = tickets.filter((t) => !["answered", "closed"].includes(t.status)).length;
@@ -60,6 +61,9 @@ function Sidebar({ active, theme, toggleTheme }: { active: string; theme: string
       ))}
 
       <div className="side-actions">
+        <button className="theme-toggle" onClick={openCmd} aria-label="Search">
+          <span>⌘K</span><span className="tlabel">Search</span>
+        </button>
         <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
           <span>{theme === "dark" ? "☀" : "☾"}</span>
           <span className="tlabel">{theme === "dark" ? "Light" : "Dark"}</span>
@@ -73,12 +77,21 @@ function Sidebar({ active, theme, toggleTheme }: { active: string; theme: string
 export default function App() {
   const route = useRoute();
   const [theme, toggleTheme] = useTheme();
+  const [cmdOpen, setCmdOpen] = useState(false);
   const active =
     route.name === "ticket" ? "queue" : route.name === "new" ? "queue" : route.name;
 
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setCmdOpen((o) => !o); }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, []);
+
   return (
     <div className="shell">
-      <Sidebar active={active} theme={theme} toggleTheme={toggleTheme} />
+      <Sidebar active={active} theme={theme} toggleTheme={toggleTheme} openCmd={() => setCmdOpen(true)} />
       <main className="main">
         <div className="main-inner">
           <div className="route-view" key={route.name === "ticket" ? `ticket-${route.id}` : route.name}>
@@ -93,6 +106,7 @@ export default function App() {
         </div>
       </main>
       <Toaster />
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
     </div>
   );
 }
