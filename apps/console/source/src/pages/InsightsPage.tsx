@@ -32,6 +32,13 @@ function Bar({ label, value, max, color }: { label: string; value: number; max: 
   );
 }
 
+const CHANNELS = [
+  { name: "Email", sub: "support@ inbox", live: true },
+  { name: "In-app form", sub: "web widget", live: true },
+  { name: "Slack", sub: "#support channel", live: true },
+  { name: "Telegram", sub: "live bot · frontline agent", live: true },
+];
+
 const CAT_COLORS = ["#2f9e63", "#2f5e93", "#997213", "#b8423d", "#5b4a93", "#0e7c86", "#71717a"];
 const PRIO_COLOR: Record<string, string> = { urgent: "#dc2626", high: "#ff5a00", normal: "#71717a", low: "#a1a1aa" };
 
@@ -92,6 +99,28 @@ export default function InsightsPage() {
         <Stat num={avgQa != null ? avgQa : "—"} label="Avg QA score" tone="mint" />
         <Stat num={shipRate != null ? `${shipRate}%` : "—"} label="Drafts ready to ship" tone="sky" />
       </div>
+
+      <Card style={{ marginBottom: 20 }}>
+        <div className="between" style={{ marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+          <h3 style={{ fontSize: 18 }}>Automation &amp; channels</h3>
+          <span className="auto-pill">⚡ Autonomous mode ON</span>
+        </div>
+        <p className="muted-text" style={{ fontSize: 13.5, marginBottom: 16, maxWidth: 720 }}>
+          Every ticket — from any channel — is auto-triaged, drafted from your docs, and graded by a second QA agent the
+          moment it arrives. A human (or Autopilot) only approves.
+        </p>
+        <div className="chan-grid">
+          {CHANNELS.map((c) => (
+            <div key={c.name} className="chan">
+              <span className={`dot ${c.live ? "s-answered" : "s-closed"}`} />
+              <div>
+                <div className="chan-name">{c.name}</div>
+                <div className="chan-sub">{c.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <div className="split" style={{ marginBottom: 20 }}>
         <Card>

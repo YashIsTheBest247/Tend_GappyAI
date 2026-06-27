@@ -64,11 +64,12 @@ export default function QueuePage() {
 
   return (
     <div>
-      <div className="page-head between">
+      <div className="page-head between" style={{ flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 className="page-title">Queue</h1>
-          <p className="page-sub">Every support request, triaged and drafted automatically.</p>
+          <p className="page-sub">Every request auto-triaged, drafted &amp; QA-graded the moment it lands.</p>
         </div>
+        <span className="auto-pill">⚡ Autonomous mode</span>
       </div>
 
       <div className="stats" style={{ marginBottom: 28 }}>

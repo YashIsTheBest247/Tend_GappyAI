@@ -1,0 +1,100 @@
+{
+  "name": "auto_intake",
+  "description": "Autonomous pipeline fired by a datastore schedule on ticket insert: triage -> persist -> draft -> persist -> QA -> persist. Reads the new ticket id from start.metadata.record_id.",
+  "start": { "type": "MANUAL" },
+  "nodes": [
+    {
+      "id": "triage",
+      "type": "AGENT",
+      "label": "Triage the ticket",
+      "config": {
+        "agent_name": "triage-agent",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "start.metadata.record_id" }
+        }
+      }
+    },
+    {
+      "id": "persist_triage",
+      "type": "FUNCTION",
+      "label": "Save classification",
+      "config": {
+        "function_name": "apply_triage",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "start.metadata.record_id" },
+          "category": { "type": "expression", "value": "triage.category" },
+          "priority": { "type": "expression", "value": "triage.priority" },
+          "sentiment": { "type": "expression", "value": "triage.sentiment" },
+          "summary": { "type": "expression", "value": "triage.summary" },
+          "tags": { "type": "expression", "value": "triage.tags" }
+        }
+      }
+    },
+    {
+      "id": "draft",
+      "type": "AGENT",
+      "label": "Draft a grounded reply",
+      "config": {
+        "agent_name": "draft-agent",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "start.metadata.record_id" }
+        }
+      }
+    },
+    {
+      "id": "persist_draft",
+      "type": "FUNCTION",
+      "label": "Save draft",
+      "config": {
+        "function_name": "save_draft",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "start.metadata.record_id" },
+          "body": { "type": "expression", "value": "draft.body" },
+          "citations": { "type": "expression", "value": "draft.citations" },
+          "confidence": { "type": "expression", "value": "draft.confidence" },
+          "needs_human": { "type": "expression", "value": "draft.needs_human" }
+        }
+      }
+    },
+    {
+      "id": "qa",
+      "type": "AGENT",
+      "label": "QA the draft",
+      "config": {
+        "agent_name": "reply-coach",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "start.metadata.record_id" },
+          "draft_id": { "type": "expression", "value": "persist_draft.draft_id" }
+        }
+      }
+    },
+    {
+      "id": "persist_qa",
+      "type": "FUNCTION",
+      "label": "Save QA verdict",
+      "config": {
+        "function_name": "save_quality",
+        "input_mapping": {
+          "ticket_id": { "type": "expression", "value": "start.metadata.record_id" },
+          "draft_id": { "type": "expression", "value": "persist_draft.draft_id" },
+          "score": { "type": "expression", "value": "qa.score" },
+          "verdict": { "type": "expression", "value": "qa.verdict" },
+          "tone": { "type": "expression", "value": "qa.tone" },
+          "grounding": { "type": "expression", "value": "qa.grounding" },
+          "issues": { "type": "expression", "value": "qa.issues" },
+          "suggestion": { "type": "expression", "value": "qa.suggestion" }
+        }
+      }
+    },
+    { "id": "done", "type": "END", "label": "Awaiting approval" }
+  ],
+  "edges": [
+    { "id": "e1", "source": "triage", "target": "persist_triage" },
+    { "id": "e2", "source": "persist_triage", "target": "draft" },
+    { "id": "e3", "source": "draft", "target": "persist_draft" },
+    { "id": "e4", "source": "persist_draft", "target": "qa" },
+    { "id": "e5", "source": "qa", "target": "persist_qa" },
+    { "id": "e6", "source": "persist_qa", "target": "done" }
+  ],
+  "visibility": "POD"
+}

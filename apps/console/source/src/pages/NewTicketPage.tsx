@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useFunctionRunner, useIntakeWorkflow } from "../lib/podData";
+import { useFunctionRunner } from "../lib/podData";
 import { Card, Btn, Field } from "../lib/ui";
 import { go } from "../lib/router";
 import { toast } from "../lib/toast";
@@ -15,12 +15,11 @@ const SAMPLES = [
 
 export default function NewTicketPage() {
   const intake = useFunctionRunner("intake_ticket");
-  const wf = useIntakeWorkflow();
   const [form, setForm] = useState({
     subject: "", body: "", channel: "email", customer_name: "", customer_email: "",
   });
   const set = (k: string) => (e: any) => setForm({ ...form, [k]: e.target.value });
-  const busy = intake.busy || wf.starting;
+  const busy = intake.busy;
 
   async function submit() {
     if (!form.subject.trim() || !form.body.trim()) {
@@ -31,10 +30,9 @@ export default function NewTicketPage() {
       const res: any = await intake.run(form);
       const out = res?.output_data ?? res?.output ?? res;
       const id = out?.ticket_id;
+      // Autonomous: a datastore schedule auto-runs triage -> draft -> QA the moment the row exists.
       if (id) {
-        // Kick triage -> draft; it runs async server-side and streams into the ticket view.
-        wf.start(id).catch(() => {});
-        toast("Ticket created — AI is triaging & drafting…", "ok");
+        toast("Ticket created — autonomously triaging, drafting & QA-ing…", "ok");
         go(`#/ticket/${id}`);
       } else {
         toast("Ticket created.", "ok");
