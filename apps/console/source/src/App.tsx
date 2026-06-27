@@ -7,6 +7,7 @@ import TicketPage from "./pages/TicketPage";
 import KnowledgePage from "./pages/KnowledgePage";
 import AssistantPage from "./pages/AssistantPage";
 import NewTicketPage from "./pages/NewTicketPage";
+import { Toaster } from "./lib/toast";
 
 const NAV = [
   { key: "queue", label: "Queue", href: "#/queue" },
@@ -88,6 +89,7 @@ export default function App() {
           {route.name === "new" && <NewTicketPage />}
         </div>
       </main>
+      <Toaster />
     </div>
   );
 }

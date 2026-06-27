@@ -152,8 +152,11 @@ input, textarea, select { font-family: inherit; }
 .main-inner { max-width: var(--page-max-width); margin: 0 auto; }
 
 .page-head { margin-bottom: 24px; }
-.page-title { font-size: 32px; font-weight: 700; }
-.page-sub { color: var(--muted); font-size: 15px; margin-top: 6px; }
+.page-title { font-size: clamp(23px, 3.4vw, 32px); font-weight: 700; }
+.page-sub { color: var(--muted); font-size: clamp(13px, 1.6vw, 15px); margin-top: 6px; }
+
+/* KPI grid that reflows cleanly at any width */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
 
 .split { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
 .split-wide { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
@@ -175,7 +178,7 @@ input, textarea, select { font-family: inherit; }
 .stat { padding: 22px 24px; border-radius: var(--radius-cards); box-shadow: var(--shadow-soft); transition: transform var(--t-spring), box-shadow var(--t-fast); }
 .stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
 .stat-cap { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
-.stat-num { font-size: 46px; font-weight: 700; color: var(--ink); line-height: 1; letter-spacing: -0.03em; }
+.stat-num { font-size: clamp(34px, 6vw, 46px); font-weight: 700; color: var(--ink); line-height: 1; letter-spacing: -0.03em; }
 .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
 .stat.mint   { background: var(--mint-bg); }   .stat.mint .stat-num   { color: var(--mint-ink); }   .stat.mint .stat-cap   { color: var(--mint-ink); }
@@ -287,4 +290,29 @@ input, textarea, select { font-family: inherit; }
   .row { flex-wrap: wrap; }
   .row-meta { width: 100%; justify-content: flex-start; padding-left: 54px; }
   .theme-toggle .tlabel { display: none; }
+  /* comfortable touch targets on phones */
+  .btn { padding: 12px 18px; min-height: 44px; }
+  .btn-sm { min-height: 38px; }
+  .nav-link { min-height: 40px; }
+  .input, .select { min-height: 46px; }
+}
+
+/* ---------- Toasts ---------- */
+.toaster {
+  position: fixed; right: 18px; bottom: 18px; z-index: 100;
+  display: flex; flex-direction: column; gap: 10px; max-width: min(92vw, 380px);
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 16px; padding: 13px 16px; font-size: 14px; font-weight: 500;
+  box-shadow: var(--shadow-hover); animation: toastIn var(--t-spring);
+}
+.toast-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; background: var(--accent); }
+.toast-ok .toast-dot { background: var(--accent); }
+.toast-err .toast-dot { background: #dc2626; }
+.toast-info .toast-dot { background: #6366f1; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 560px) {
+  .toaster { left: 12px; right: 12px; bottom: 12px; max-width: none; }
 }

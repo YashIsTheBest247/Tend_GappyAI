@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useFunctionRunner } from "../lib/podData";
+import { useFunctionRunner, useIntakeWorkflow } from "../lib/podData";
 import { Card, Btn, Field } from "../lib/ui";
 import { go } from "../lib/router";
+import { toast } from "../lib/toast";
 
 const SAMPLES = [
   { label: "Refund", subject: "Charged twice this month",
@@ -14,20 +15,34 @@ const SAMPLES = [
 
 export default function NewTicketPage() {
   const intake = useFunctionRunner("intake_ticket");
+  const wf = useIntakeWorkflow();
   const [form, setForm] = useState({
     subject: "", body: "", channel: "email", customer_name: "", customer_email: "",
   });
   const set = (k: string) => (e: any) => setForm({ ...form, [k]: e.target.value });
+  const busy = intake.busy || wf.starting;
 
   async function submit() {
     if (!form.subject.trim() || !form.body.trim()) {
-      alert("Subject and message are required.");
+      toast("Subject and message are required.", "err");
       return;
     }
-    const res: any = await intake.run(form);
-    const out = res?.output_data ?? res?.output ?? res;
-    const id = out?.ticket_id;
-    go(id ? `#/ticket/${id}` : "#/queue");
+    try {
+      const res: any = await intake.run(form);
+      const out = res?.output_data ?? res?.output ?? res;
+      const id = out?.ticket_id;
+      if (id) {
+        // Kick triage -> draft; it runs async server-side and streams into the ticket view.
+        wf.start(id).catch(() => {});
+        toast("Ticket created — AI is triaging & drafting…", "ok");
+        go(`#/ticket/${id}`);
+      } else {
+        toast("Ticket created.", "ok");
+        go("#/queue");
+      }
+    } catch {
+      toast("Couldn't create the ticket. Try again.", "err");
+    }
   }
 
   return (
@@ -58,7 +73,7 @@ export default function NewTicketPage() {
             </div>
           </div>
           <Field label="Customer email"><input className="input" value={form.customer_email} onChange={set("customer_email")} placeholder="name@company.com" /></Field>
-          <Btn onClick={submit} disabled={intake.busy}>{intake.busy ? "Creating…" : "Create ticket"}</Btn>
+          <Btn variant="accent" onClick={submit} disabled={busy}>{busy ? "Creating…" : "Create ticket & run AI"}</Btn>
         </Card>
 
         <Card className="muted compact">

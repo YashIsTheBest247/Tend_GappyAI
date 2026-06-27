@@ -7,6 +7,7 @@ import {
   useFunctionRun,
   useFiles,
   useFileSearch,
+  useWorkflowStart,
 } from "lemma-sdk/react";
 import { client, podId } from "./lemmaClient";
 
@@ -91,6 +92,15 @@ export function useFunctionRunner(functionName: string) {
     busy: fn.isPolling,
     output: (fn.finalOutput ?? fn.output) as Record<string, unknown> | null,
     error: fn.error,
+  };
+}
+
+/** Starts the `intake` workflow (triage -> draft) for a ticket, submitting ticket_id to its entry form. */
+export function useIntakeWorkflow() {
+  const wf = useWorkflowStart({ client, podId, workflowName: "intake", autoLoad: false, autoPoll: false });
+  return {
+    start: (ticketId: string) => wf.start({ ticket_id: ticketId }),
+    starting: Boolean(wf.isStarting),
   };
 }
 

@@ -40,6 +40,8 @@ function TicketRow({ t }: { t: Ticket }) {
 export default function QueuePage() {
   const { tickets, isLoading } = useTickets();
   const [filter, setFilter] = useState("open");
+  const [priority, setPriority] = useState("all");
+  const [query, setQuery] = useState("");
 
   const open = tickets.filter((t) => !["answered", "closed"].includes(t.status)).length;
   const awaiting = tickets.filter((t) => t.status === "awaiting_approval").length;
@@ -47,7 +49,16 @@ export default function QueuePage() {
   const answered = tickets.filter((t) => t.status === "answered").length;
 
   const active = FILTERS.find((f) => f.key === filter)!;
-  const shown = tickets.filter(active.match);
+  const q = query.trim().toLowerCase();
+  const shown = tickets
+    .filter(active.match)
+    .filter((t) => priority === "all" || t.priority === priority)
+    .filter((t) =>
+      !q ||
+      [t.subject, t.customer_name, t.customer_email, t.summary, t.category, ...(t.tags ?? [])]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
+    );
 
   return (
     <div>
@@ -58,29 +69,54 @@ export default function QueuePage() {
         </div>
       </div>
 
-      <div className="card-row" style={{ marginBottom: 28 }}>
+      <div className="stats" style={{ marginBottom: 28 }}>
         <Stat num={open} label="Open tickets" tone="mint" />
         <Stat num={awaiting} label="Awaiting approval" tone="amber" />
         <Stat num={escalated} label="Escalated" tone="rose" />
         <Stat num={answered} label="Answered" tone="violet" />
       </div>
 
-      <div className="wrap" style={{ marginBottom: 16 }}>
-        {FILTERS.map((f) => (
-          <button
-            key={f.key}
-            className={`btn btn-sm ${filter === f.key ? "btn-primary" : "btn-soft"}`}
-            onClick={() => setFilter(f.key)}
-          >
-            {f.label}
-          </button>
-        ))}
+      <input
+        className="input"
+        style={{ marginBottom: 14 }}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by subject, customer, tag, category…"
+      />
+
+      <div className="between" style={{ flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+        <div className="wrap">
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              className={`btn btn-sm ${filter === f.key ? "btn-primary" : "btn-soft"}`}
+              onClick={() => setFilter(f.key)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="wrap">
+          {["all", "urgent", "high", "normal", "low"].map((p) => (
+            <button
+              key={p}
+              className={`btn btn-sm ${priority === p ? "btn-accent" : "btn-soft"}`}
+              onClick={() => setPriority(p)}
+            >
+              {p === "all" ? "Any priority" : p[0].toUpperCase() + p.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="muted-text" style={{ fontSize: 13, marginBottom: 10 }}>
+        {shown.length} {shown.length === 1 ? "ticket" : "tickets"}
       </div>
 
       {isLoading ? (
         <Loading label="Loading queue" />
       ) : shown.length === 0 ? (
-        <Card><Empty>No tickets here yet. Create one from “+ New ticket”.</Empty></Card>
+        <Card><Empty>{q || priority !== "all" ? "No tickets match your filters." : "No tickets here yet. Create one from “+ New ticket”."}</Empty></Card>
       ) : (
         <div className="grid" style={{ gap: 10 }}>
           {shown.map((t) => <TicketRow key={t.id} t={t} />)}

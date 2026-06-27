@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  useTicket, useMessages, useDrafts, useEvents, useFunctionRunner, Draft,
+  useTicket, useMessages, useDrafts, useEvents, useFunctionRunner, useIntakeWorkflow, Draft,
 } from "../lib/podData";
 import { Card, Btn, Badge, StatusPill, PriorityTag, CategoryTag, Avatar, Loading, Empty } from "../lib/ui";
 import { go } from "../lib/router";
+import { toast } from "../lib/toast";
 import { CHANNEL_LABEL, timeAgo, slaState } from "../lib/format";
 
 function Conversation({ ticketId }: { ticketId: string }) {
@@ -55,7 +56,7 @@ function DraftPanel({ ticketId, draft }: { ticketId: string; draft: Draft | null
 
   async function submit(decision: "approve" | "reject") {
     if (decision === "reject" && !notes.trim()) {
-      alert("Add a note so the AI can re-d.");
+      toast("Add a note so the AI can re-draft.", "err");
       return;
     }
     await decide.run({
@@ -65,7 +66,13 @@ function DraftPanel({ ticketId, draft }: { ticketId: string; draft: Draft | null
       edited_body: decision === "approve" ? body : undefined,
       notes: notes.trim() || undefined,
     });
-    setDone(decision === "approve" ? "Reply approved & sent." : "Sent back for a re-d.");
+    if (decision === "approve") {
+      setDone("Reply approved & sent.");
+      toast("Reply approved & sent ✓", "ok");
+    } else {
+      setDone("Sent back for a re-draft.");
+      toast("Sent back — re-run the AI to draft again.", "info");
+    }
   }
 
   return (
@@ -144,6 +151,7 @@ export default function TicketPage({ id }: { id: string }) {
   const { ticket, isLoading } = useTicket(id);
   const { drafts } = useDrafts(id);
   const escalate = useFunctionRunner("escalate_ticket");
+  const wf = useIntakeWorkflow();
   const latest = drafts[0] ?? null;
   const sla = slaState(ticket?.sla_due_at);
 
@@ -164,10 +172,16 @@ export default function TicketPage({ id }: { id: string }) {
             {CHANNEL_LABEL[ticket.channel] ?? ticket.channel}
           </p>
         </div>
-        <Btn variant="ghost" size="sm" disabled={escalate.busy}
-             onClick={() => escalate.run({ ticket_id: ticket.id, reason: "Manually escalated from console." })}>
-          Escalate
-        </Btn>
+        <div className="wrap" style={{ flexWrap: "nowrap" }}>
+          <Btn variant="accent" size="sm" disabled={wf.starting}
+               onClick={async () => { try { await wf.start(ticket.id); toast("AI is re-running — triage & draft…", "ok"); } catch { toast("Couldn't start the AI.", "err"); } }}>
+            {wf.starting ? "Running…" : "Run AI"}
+          </Btn>
+          <Btn variant="ghost" size="sm" disabled={escalate.busy}
+               onClick={async () => { await escalate.run({ ticket_id: ticket.id, reason: "Manually escalated from console." }); toast("Ticket escalated", "info"); }}>
+            Escalate
+          </Btn>
+        </div>
       </div>
 
       <div className="wrap" style={{ marginBottom: 24 }}>
